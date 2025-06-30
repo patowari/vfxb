@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFXB - AI-powered editor for everyone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: all 0.3s ease;
+        }
+
+        .cursor-text {
+            position: fixed;
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .cursor-text.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: relative;
+            z-index: 100;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: clamp(20px, 3vw, 24px);
+            font-weight: bold;
+        }
+
+        .logo::before {
+        
+            margin-right: 8px;
+            font-size: clamp(24px, 3.5vw, 28px);
+        }
+
+        .nav {
+            display: flex;
+            gap: clamp(20px, 4vw, 40px);
+            align-items: center;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 8px 0;
+            transition: color 0.3s ease;
+            font-size: clamp(14px, 2vw, 16px);
+        }
+
+        .nav-item:hover {
+            color: #ff6b6b;
+        }
+
+        .nav-item.hot::after {
+            content: "Hot";
+            background: #ff6b6b;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            position: absolute;
+            top: -5px;
+            right: -20px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: clamp(10px, 2vw, 12px) clamp(18px, 3vw, 24px);
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: none;
+            font-size: clamp(12px, 2vw, 14px);
+            white-space: nowrap;
+        }
+
+        .btn-outline {
+            border: 2px solid white;
+            color: white;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #0a0a0a;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: white;
+            color: #0a0a0a;
+            border: 2px solid white;
+        }
+
+        .btn-primary:hover {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu .nav-item {
+            font-size: 24px;
+        }
+
+        .mobile-menu .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+        }
+
+        .close-menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            text-align: center;
+           /* padding: clamp(60px, 12vw, 100px) 5% clamp(40px, 8vw, 60px); */
+            position: relative;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin-bottom: 5px;
+            margin-top: 10px;
+            backdrop-filter: blur(10px);
+            font-size: clamp(12px, 2vw, 14px);
+        }
+
+        .badge::before {
+            content: "";
+            margin-right: 6px;
+        }
+
+        .main-title {
+            font-size: 60px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: clamp(20px, 4vw, 30px);
+            background: linear-gradient(45deg, #fff, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .main-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: clamp(40px, 8vw, 80px);
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 15px;
+            font-size:15px;
+            border-radius: 18px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 0 5%;
+            max-width: 2000px;
+            margin: 0 auto;
+            position: center;
+            justify-content: center ;
+        }
+
+        .features-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+
+        }
+
+        .features-scroll {
+            display: flex;
+            padding: 20px 10px;
+            gap: 50px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .features-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px 8px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+            cursor: none;
+            position: relative;
+            overflow: hidden;
+            min-width: 216px;
+            max-width: 216px;
+            height: 226px;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 107, 107, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 107, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-preview {
+            width: 100%;
+            height: 90px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-preview img {
+            width: 100%;
+            height:     100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .feature-preview::after {
+            content: '▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 30px;
+            color: white;
+            transform: translate(-50%, -50%);
+            opacity: 0.9;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* Navigation Arrows */
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 107, 107, 0.8);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-arrow.prev {
+            left: 10px;
+        }
+
+        .nav-arrow.next {
+            right: 10px;
+        }
+
+        /* Feature specific gradients */
+        .feature-card:nth-child(1) .feature-preview {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .feature-card:nth-child(2) .feature-preview {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .feature-card:nth-child(3) .feature-preview {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .feature-card:nth-child(4) .feature-preview {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .feature-card:nth-child(5) .feature-preview {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .feature-card:nth-child(6) .feature-preview {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .feature-card:nth-child(1) .feature-preview::after { content: '🎬'; font-size: 40px; }
+        .feature-card:nth-child(2) .feature-preview::after { content: '💬'; font-size: 40px; }
+        .feature-card:nth-child(3) .feature-preview::after { content: '🔗'; font-size: 40px; }
+        .feature-card:nth-child(4) .feature-preview::after { content: '👤'; font-size: 40px; }
+        .feature-card:nth-child(5) .feature-preview::after { content: '🔊'; font-size: 40px; }
+        .feature-card:nth-child(6) .feature-preview::after { content: '✨'; font-size: 40px; }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Particles Background */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .nav {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .header-buttons .btn-outline {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 5%;
+            }
+            
+            .main-content {
+                padding: 50px 5% 40px;
+            }
+            
+            .features-scroll {
+                padding: 30px 20px;
+                gap: 15px;
+            }
+            
+            .feature-card {
+                min-width: 250px;
+                padding: 25px 20px;
+            }
+            
+            .feature-preview {
+                height: 150px;
+                margin-bottom: 15px;
+            }
+            
+            .feature-title {
+                font-size: 1.1rem;
+            }
+            
+            .feature-description {
+                font-size: 0.85rem;
+            }
+            
+            .nav-arrow {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .btn-large {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .features-scroll {
+                padding: 20px 15px;
+            }
+            
+            .feature-card {
+                min-width: 216px;
+                max-width: 216px;
+                height: 226px;
+                padding: 12px 8px;
+            }
+            
+            .feature-preview {
+                height: 90px;
+            }
+            
+            .nav-arrow {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+        }
+
+        /* Touch devices */
+        @media (hover: none) and (pointer: coarse) {
+            .cursor,
+            .cursor-follower,
+            .cursor-text {
+                display: none;
+            }
+            
+            body {
+                cursor: auto;
+            }
+            
+            .btn,
+            .feature-card,
+            .nav-item {
+                cursor: pointer;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .feature-preview::after {
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+        }
+
+        /* Landscape mobile */
+        @media screen and (max-height: 500px) and (orientation: landscape) {
+            .main-content {
+                padding: 30px 5% 20px;
+            }
+            
+            .main-title {
+                font-size: clamp(2rem, 6vw, 3rem);
+            }
+            
+            .features-scroll {
+                padding: 20px;
+            }
+        }
+
+        /* Background Video */
+        #bg-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.22; /* Adjust for desired darkness */
+            background: #111;
+            pointer-events: none;
+            display: block;
+        }
+
+        .body-bg-video-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body style="position:relative; background:#111;">
+    <!-- Background Video (body section only) -->
+    <div class="body-bg-video-wrapper">
+        <video id="bg-video" autoplay loop muted playsinline></video>
+    </div>
+    <script>
+        // Set video source dynamically for Windows path compatibility
+        document.getElementById('bg-video').src = "background-video.mp4";
+    </script>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    <div class="cursor-text">Try Now</div>
+
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" onclick="toggleMobileMenu()">&times;</button>
+        <a href="#" class="nav-item">Products</a>
+        <a href="#" class="nav-item hot">AI tools</a>
+        <a href="#" class="nav-item">Solutions</a>
+        <a href="#" class="nav-item">Resources</a>
+        <a href="#" class="nav-item">NewsRoom</a>
+        <a href="#" class="btn btn-outline">Try VFXB Online</a>
+        <a href="#" class="btn btn-primary">Download</a>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="vfxb.png" alt="VFXB Logo" style="height:35px;vertical-align:middle;margin-right:8px;">
+        </div>
+        <nav class="nav">
+            <a href="#" class="nav-item">Products</a>
+            <a href="#" class="nav-item hot">AI tools</a>
+            <a href="#" class="nav-item">Solutions</a>
+            <a href="#" class="nav-item">Resources</a>
+            <a href="#" class="nav-item">NewsRoom</a>
+        </nav>
+        <div class="header-buttons">
+            <a href="#" class="btn btn-outline">Try VFXB Online</a>
+            <a href="#" class="btn btn-primary">Download</a>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="badge pulse">All-in-one</div>
+        <h1 class="main-title float">AI-powered editor<br>for everyone</h1>
+        <p class="subtitle">Think bigger. Edit faster.</p>
+        <div class="main-buttons">
+            <a href="#" class="btn btn-primary btn-large">Download</a>
+            <a href="#" class="btn btn-outline btn-large">Try online</a>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <button class="nav-arrow prev" onclick="scrollFeatures('left')">‹</button>
+            <div class="features-scroll" id="featuresScroll">
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">AI video maker</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">AI captions</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Link to video</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Avatar video</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Text to speech</h3>
+
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Dreamina</h3>
+                </div>
+            </div>
+            <button class="nav-arrow next" onclick="scrollFeatures('right')">›</button>
+        </div>
+    </section>
+
+    <!-- Showcase index2.html below features section -->
+    
+
+    <script>
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Features Scroll
+        function scrollFeatures(direction) {
+            const container = document.getElementById('featuresScroll');
+            const cardWidth = 300; // Approximate card width + gap
+            
+            if (direction === 'left') {
+                container.scrollLeft -= cardWidth;
+            } else {
+                container.scrollLeft += cardWidth;
+            }
+        }
+
+        // Custom Cursor (only for non-touch devices)
+        if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            const cursor = document.querySelector('.cursor');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            const cursorText = document.querySelector('.cursor-text');
+            let mouseX = 0;
+            let mouseY = 0;
+            let followerX = 0;
+            let followerY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.left = mouseX + 'px';
+                cursor.style.top = mouseY + 'px';
+                cursorText.style.left = mouseX + 'px';
+                cursorText.style.top = (mouseY - 50) + 'px';
+            });
+
+            // Smooth follower animation
+            function updateFollower() {
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+                cursorFollower.style.left = followerX + 'px';
+                cursorFollower.style.top = followerY + 'px';
+                requestAnimationFrame(updateFollower);
+            }
+            updateFollower();
+
+            // Show "Try Now" only over .features-section
+            const featuresSection = document.querySelector('.features-section');
+            featuresSection.addEventListener('mouseenter', () => {
+                cursorText.classList.add('show');
+            });
+            featuresSection.addEventListener('mouseleave', () => {
+                cursorText.classList.remove('show');
+            });
+
+            // Remove cursorText show from other interactive elements
+            const interactiveElements = document.querySelectorAll('.btn, .feature-card, .nav-item');
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    cursor.style.transform = 'scale(1.5)';
+                    cursorFollower.style.transform = 'scale(1.5)';
+                    // Do NOT show cursorText here
+                });
+                element.addEventListener('mouseleave', () => {
+                    cursor.style.transform = 'scale(1)';
+                    cursorFollower.style.transform = 'scale(1)';
+                    // Do NOT hide cursorText here, handled by features-section
+                });
+            });
+        }
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 25 : 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles
+        createParticles();
+
+        // Button click effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Create ripple effect
+                const ripple = document.createElement('span');
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                btn.style.position = 'relative';
+                btn.style.overflow = 'hidden';
+                btn.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+                
+                // Simulate action
+                setTimeout(() => {
+                    alert('Feature coming soon! This is a demo.');
+                }, 300);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Feature card interactions
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('.feature-title').textContent;
+                alert(`${title} feature selected! This is a demo.`);
+            });
+        });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.float');
+            
+            parallaxElements.forEach(element => {
+                const speed = 0.2;
+                element.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+
+        // Touch scroll for features on mobile
+        let isScrolling = false;
+        const featuresScroll = document.getElementById('featuresScroll');
+
+        featuresScroll.addEventListener('touchstart', () => {
+            isScrolling = true;
+        });
+
+        featuresScroll.addEventListener('touchend', () => {
+            setTimeout(() => {
+                isScrolling = false;
+            }, 100);
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Resize handler for particles
+        window.addEventListener('resize', () => {
+            // Clear existing particles
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            
+            // Recreate particles with appropriate count
+            createParticles();
+        });
+
+        // Keyboard navigation for features
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                scrollFeatures('left');
+            } else if (e.key === 'ArrowRight') {
+                scrollFeatures('right');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards for scroll animations
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Auto-scroll features on desktop
+        let autoScrollInterval;
+        
+        function startAutoScroll() {
+            if (window.innerWidth > 768) {
+                autoScrollInterval = setInterval(() => {
+                    const container = document.getElementById('featuresScroll');
+                    const maxScroll = container.scrollWidth - container.clientWidth;
+                    
+                    if (container.scrollLeft >= maxScroll) {
+                        container.scrollLeft = 0;
+                    } else {
+                        container.scrollLeft += 300;
+                    }
+                }, 4000);
+            }
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+
+        // Start auto-scroll when page loads
+        setTimeout(startAutoScroll, 3000);
+
+        // Stop auto-scroll when user interacts
+        featuresScroll.addEventListener('mouseenter', stopAutoScroll);
+        featuresScroll.addEventListener('touchstart', stopAutoScroll);
+
+        // Smooth scroll behavior for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Performance optimization for mobile
+        if (window.innerWidth < 768) {
+            // Reduce particle count and disable some animations on mobile
+            document.querySelectorAll('.float').forEach(el => {
+                el.classList.remove('float');
+            });
+        }
+
+        // Loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+
+</html>

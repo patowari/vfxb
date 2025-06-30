@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFXB - Professional AI Video Toolkit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .scroll-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            background: radial-gradient(ellipse at center, #0f0f0f 0%, #000 70%);
+        }
+
+        .section, .final-section {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            scroll-snap-align: start;
+            position: relative;
+            background: transparent;
+        }
+
+        .final-section {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            justify-content: center;
+            text-align: center;
+        }
+
+        .image-container {
+            position: fixed;
+            left: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: min(45vw, 600px);
+            height: min(35vh, 420px);
+            border-radius: 24px;
+            overflow: hidden;
+            z-index: 2;
+            background: #111;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .image-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            background-size: cover;
+            background-position: center;
+            transform: scale(1.05);
+        }
+
+        .image-slide.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .image-slide.prev {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+
+        .content {
+            margin-left: min(50vw, 650px);
+            max-width: min(45vw, 600px);
+            opacity: 0;
+            transform: translateX(60px);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 3;
+            position: relative;
+        }
+
+        .section.active .content {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .header {
+            position: fixed;
+            top: min(5vh, 60px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 50%, #c0c0c0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .header .subtitle {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: #888;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .content h2 {
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 800;
+            margin-bottom: min(4vh, 40px);
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .content p {
+            font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+            line-height: 1.6;
+            margin-bottom: min(6vh, 60px);
+            color: #b0b0b0;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 18px 36px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(1rem, 2vw, 1.1rem);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            letter-spacing: 0.02em;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            color: #000;
+            box-shadow: 0 8px 25px rgba(255,255,255,0.15);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(255,255,255,0.1);
+        }
+
+        .final-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            scroll-snap-align: start;
+            position: relative;
+        }
+
+        .final-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+        }
+
+        .final-section .content-wrapper {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 5%;
+        }
+
+        .final-section h2 {
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 900;
+            margin-bottom: min(4vh, 40px);
+            text-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #e0e0ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .final-section p {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            margin-bottom: min(8vh, 80px);
+            opacity: 0.9;
+            color: #d0d0d0;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            right: min(5vw, 60px);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .scroll-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .scroll-dot::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .scroll-dot.active::before {
+            border-color: rgba(255,255,255,0.3);
+        }
+
+        .scroll-dot:hover {
+            background: rgba(255,255,255,0.6);
+            transform: scale(1.1);
+        }
+
+        /* Custom scrollbar */
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-container {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .content {
+                margin-left: min(48vw, 580px);
+                max-width: min(47vw, 520px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .section, .final-section {
+                flex-direction: column;
+                padding: 0 5%;
+                text-align: center;
+            }
+
+            .image-container {
+                position: relative;
+                left: auto;
+                top: auto;
+                transform: none;
+                width: 90vw;
+                height: 40vh;
+                margin-bottom: 5vh;
+            }
+
+            .content {
+                margin-left: 0;
+                max-width: 90vw;
+            }
+
+            .scroll-indicator {
+                right: 20px;
+            }
+
+            .buttons {
+                justify-content: center;
+            }
+        }
+
+        /* Enhanced loading animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section.active .content h2 {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+
+        .section.active .content p {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.4s both;
+        }
+
+        .section.active .content .buttons {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.6s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Video Toolkit</h1>
+        <div class="subtitle">Professional editing powered by artificial intelligence</div>
+    </div>
+
+    <div class="scroll-container" id="scrollContainer">
+        <!-- Section 1: Long video to shorts -->
+        <div class="section" data-section="0">
+            <div class="content">
+                <h2>Long Video to Shorts</h2>
+                <p>Transform lengthy content into engaging social media clips with intelligent scene detection. Our AI identifies the most compelling moments and creates perfectly timed shorts that capture your audience's attention.</p>
+                <div class="buttons">
+                    <a href="#" class="btn btn-primary">Download Now</a>
+                    <a href="#" class="btn btn-secondary">Try Online</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Clips to video -->
+        <div class="section" data-section="1">
+            <div class="content">
+                <h2>Clips to Video</h2>
+                <p>Seamlessly combine multiple clips into a cohesive narrative. Advanced AI handles transitions, timing, and flow automatically, delivering professional results without the complexity of traditional editing workflows.</p>
+                <div class="buttons">
+                    <a href="#" class="btn btn-primary">Download Now</a>
+                    <a href="#" class="btn btn-secondary">Try Online</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Video upscaler -->
+        <div class="section" data-section="2">
+            <div class="content">
+                <h2>Video Upscaler</h2>
+                <p>Enhance video quality with cutting-edge upscaling technology. Restore clarity to low-resolution footage, reduce noise, and improve detail definition for professional-grade output from any source material.</p>
+                <div class="buttons">
+                    <a href="#" class="btn btn-primary">Download Now</a>
+                    <a href="#" class="btn btn-secondary">Try Online</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Section -->
+        <div class="final-section">
+            <div class="content-wrapper">
+                <h2>Edit with VFXB</h2>
+                <p>Experience the future of video editing with our comprehensive AI-powered toolkit. From concept to completion, create professional content faster than ever before.</p>
+                <div class="buttons">
+                    <a href="#" class="btn btn-primary">Get Started Today</a>
+                    <a href="#" class="btn btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Image Container -->
+    <div class="image-container">
+        <div class="image-slide active" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgdmlld0JveD0iMCAwIDYwMCA0MjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJhIiB4MT0iMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI0MjAiPjxzdG9wIHN0b3AtY29sb3I9IiNmZmY5ZTYiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNmZmU4YjMiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0idXJsKCNhKSIgcng9IjI0Ii8+PHJlY3QgeD0iNDAiIHk9IjQwIiB3aWR0aD0iNTIwIiBoZWlnaHQ9IjEwMCIgcng9IjE2IiBmaWxsPSJyZ2JhKDEzOSw4MCwwLDAuMykiIHN0cm9rZT0iIzhiNTAwMCIgc3Ryb2tlLXdpZHRoPSIzIi8+PHJlY3QgeD0iNDAiIHk9IjE2MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI4MCIgcng9IjEyIiBmaWxsPSIjOGI1MDAwIi8+PHJlY3QgeD0iMjIwIiB5PSIxNjAiIHdpZHRoPSIxNjAiIGhlaWdodD0iODAiIHJ4PSIxMiIgZmlsbD0iIzhiNTAwMCIvPjxyZWN0IHg9IjQwMCIgeT0iMTYwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjgwIiByeD0iMTIiIGZpbGw9IiM4YjUwMDAiLz48cGF0aCBkPSJNMTIwIDI2MEwyODAgMjgwTTQ4MCAyNjBMMzIwIDI4MCIgc3Ryb2tlPSIjOGI1MDAwIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjx0ZXh0IHg9IjMwMCIgeT0iMzgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjOGI1MDAwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjYwMCI+TG9uZyBWaWRlbyB0byBTaG9ydHM8L3RleHQ+PC9zdmc+')"></div>
+        <div class="image-slide" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgdmlld0JveD0iMCAwIDYwMCA0MjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJiIiB4MT0iMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI0MjAiPjxzdG9wIHN0b3AtY29sb3I9IiMxZTMxNTIiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzNzQxNTEiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0idXJsKCNiKSIgcng9IjI0Ii8+PHJlY3QgeD0iNDAiIHk9IjYwIiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEwMCIgcng9IjE2IiBmaWxsPSIjNjM2NmYxIi8+PHJlY3QgeD0iMjQwIiB5PSI2MCIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzYzNjZmMSIvPjxyZWN0IHg9IjQ0MCIgeT0iNjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTAwIiByeD0iMTYiIGZpbGw9IiM2MzY2ZjEiLz48cGF0aCBkPSJNMTAwIDIwMEwzMDAgMjQwTTUwMCAyMDBMMzAwIDI0MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1kYXNoYXJyYXk9IjgsOCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+PHJlY3QgeD0iMjIwIiB5PSIyMjAiIHdpZHRoPSIxNjAiIGhlaWdodD0iNDAiIHJ4PSIyMCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjMwMCIgeT0iMzgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjYwMCI+Q2xpcHMgdG8gVmlkZW88L3RleHQ+PC9zdmc+')"></div>
+        <div class="image-slide" style="background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgdmlld0JveD0iMCAwIDYwMCA0MjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJjIiB4MT0iMCIgeTE9IjAiIHgyPSI2MDAiIHkyPSI0MjAiPjxzdG9wIHN0b3AtY29sb3I9IiMyZDFiNjkiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM4YjVjZjYiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNjAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0idXJsKCNjKSIgcng9IjI0Ii8+PHJlY3QgeD0iNjAiIHk9IjgwIiB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE0MCIgcng9IjIwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMikiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtZGFzaGFycmF5PSIxMiw2Ii8+PHJlY3QgeD0iMzQwIiB5PSI4MCIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIxNDAiIHJ4PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjkpIi8+PHBhdGggZD0iTTI4MCAyNDBMMzIwIDI0MCIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiLz48ZGVmcz48bWFya2VyIGlkPSJhcnJvdyIgbWFya2VyV2lkdGg9IjEwIiBtYXJrZXJIZWlnaHQ9IjEwIiByZWZYPSI5IiByZWZZPSIzIiBvcmllbnQ9ImF1dG8iIG1hcmtlclVuaXRzPSJzdHJva2VXaWR0aCI+PHBhdGggZD0iTTAsMCBMMCw2IEw5LDMgeiIgZmlsbD0iI2ZmZiIvPjwvbWFya2VyPjwvZGVmcz48dGV4dCB4PSIxNjAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2ZmZiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI2MDAiPkJsdXJyeTwvdGV4dD48dGV4dCB4PSI0NDAiIHk9IjE2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzAwMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiIGZvbnQtd2VpZ2h0PSI2MDAiPkNyaXNwICZhbXA7IENsZWFyPC90ZXh0Pjx0ZXh0IHg9IjMwMCIgeT0iMzgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZmZmIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9IjYwMCI+QUkgVmlkZW8gVXBzY2FsZXI8L3RleHQ+PC9zdmc+')"></div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-dot active" data-section="0"></div>
+        <div class="scroll-dot" data-section="1"></div>
+        <div class="scroll-dot" data-section="2"></div>
+        <div class="scroll-dot" data-section="3"></div>
+    </div>
+
+    <script>
+        const scrollContainer = document.getElementById('scrollContainer');
+        const sections = document.querySelectorAll('.section, .final-section');
+        const imageSlides = document.querySelectorAll('.image-slide');
+        const scrollDots = document.querySelectorAll('.scroll-dot');
+        
+        let currentSection = 0;
+        let isScrolling = false;
+
+        function updateActiveSection() {
+            // Update sections with enhanced transitions
+            sections.forEach((section, index) => {
+                section.classList.toggle('active', index === currentSection);
+            });
+
+            // Update images with smooth transitions
+            imageSlides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index === currentSection && currentSection < 3) {
+                    slide.classList.add('active');
+                } else if (index < currentSection && currentSection < 3) {
+                    slide.classList.add('prev');
+                }
+            });
+
+            // Update scroll dots
+            scrollDots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSection);
+            });
+        }
+
+        function handleScroll() {
+            if (isScrolling) return;
+
+            const scrollTop = scrollContainer.scrollTop;
+            const sectionHeight = window.innerHeight;
+            const newSection = Math.round(scrollTop / sectionHeight);
+
+            if (newSection !== currentSection && newSection >= 0 && newSection < sections.length) {
+                currentSection = newSection;
+                updateActiveSection();
+            }
+        }
+
+        // Optimized scroll handler with throttling
+        let scrollTimeout;
+        scrollContainer.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(handleScroll, 16); // ~60fps
+        });
+
+        // Enhanced scroll dot click handlers
+        scrollDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                if (currentSection === index) return;
+                
+                currentSection = index;
+                isScrolling = true;
+                
+                scrollContainer.scrollTo({
+                    top: index * window.innerHeight,
+                    behavior: 'smooth'
+                });
+                
+                updateActiveSection();
+                
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 1000);
+            });
+        });
+
+        // Enhanced smooth scroll snap behavior
+        let scrollTimer;
+        let lastScrollTop = 0;
+        
+        scrollContainer.addEventListener('scroll', () => {
+            const currentScrollTop = scrollContainer.scrollTop;
+            
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => {
+                if (Math.abs(currentScrollTop - lastScrollTop) < 5) return;
+                
+                const sectionHeight = window.innerHeight;
+                const targetSection = Math.round(currentScrollTop / sectionHeight);
+                const targetScrollTop = targetSection * sectionHeight;
+                
+                if (Math.abs(currentScrollTop - targetScrollTop) > 20) {
+                    scrollContainer.scrollTo({
+                        top: targetScrollTop,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                lastScrollTop = currentScrollTop;
+            }, 200);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                if (currentSection < sections.length - 1) {
+                    currentSection++;
+                    scrollContainer.scrollTo({
+                        top: currentSection * window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                    updateActiveSection();
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                if (currentSection > 0) {
+                    currentSection--;
+                    scrollContainer.scrollTo({
+                        top: currentSection * window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                    updateActiveSection();
+                }
+            }
+        });
+
+        // Mouse wheel optimization for better scroll control
+        let wheelTimeout;
+        scrollContainer.addEventListener('wheel', (e) => {
+            if (isScrolling) return;
+            
+            clearTimeout(wheelTimeout);
+            wheelTimeout = setTimeout(() => {
+                const delta = e.deltaY > 0 ? 1 : -1;
+                const newSection = Math.max(0, Math.min(currentSection + delta, sections.length - 1));
+                
+                if (newSection !== currentSection) {
+                    isScrolling = true;
+                    currentSection = newSection;
+                    
+                    scrollContainer.scrollTo({
+                        top: currentSection * window.innerHeight,
+                        behavior: 'smooth'
+                    });
+                    
+                    updateActiveSection();
+                    
+                    setTimeout(() => {
+                        isScrolling = false;
+                    }, 800);
+                }
+            }, 50);
+        }, { passive: true });
+
+        // Touch/swipe support for mobile
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        scrollContainer.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        scrollContainer.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0 && currentSection < sections.length - 1) {
+                    // Swipe up - next section
+                    currentSection++;
+                } else if (diff < 0 && currentSection > 0) {
+                    // Swipe down - previous section
+                    currentSection--;
+                }
+                
+                scrollContainer.scrollTo({
+                    top: currentSection * window.innerHeight,
+                    behavior: 'smooth'
+                });
+                
+                updateActiveSection();
+            }
+        }
+
+        // Initialize with smooth entrance animation
+        updateActiveSection();
+        
+        // Handle resize with debouncing
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                scrollContainer.scrollTo({
+                    top: currentSection * window.innerHeight,
+                    behavior: 'auto'
+                });
+            }, 100);
+        });
+
+        // Preload and optimize performance
+        window.addEventListener('load', () => {
+            // Add loaded class for any additional animations
+            document.body.classList.add('loaded');
+            
+            // Initialize first section as active
+            sections[0].classList.add('active');
+        });
+
+        // Intersection Observer for better performance on scroll
+        const observerOptions = {
+            root: scrollContainer,
+            rootMargin: '0px',
+            threshold: 0.5
+        };
+
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionIndex = Array.from(sections).indexOf(entry.target);
+                    if (sectionIndex !== -1 && sectionIndex !== currentSection) {
+                        currentSection = sectionIndex;
+                        updateActiveSection();
+                    }
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            sectionObserver.observe(section);
+        });
+    </script>
+</body>
+</html>
