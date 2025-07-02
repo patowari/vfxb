@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VFXB - AI-powered editor for everyone</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="position:relative; background:#111;">
+    <!-- Background Video -->
+    <div class="body-bg-video-wrapper">
+        <video id="bg-video" autoplay loop muted playsinline></video>
+    </div>
+    <script>
+        document.getElementById('bg-video').src = "background-video.mp4";
+    </script>
+
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+    <div class="cursor-text">Try Now</div>
+
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="close-menu" onclick="toggleMobileMenu()">&times;</button>
+        <div class="dropdown">
+            <a href="#" class="nav-item">Products</a>
+            <div class="dropdown-content">
+                <a href="products.html" class="dropdown-item">
+                    Video Editor
+                    <div class="item-desc">Professional video editing tools</div>
+                </a>
+                <a href="products.html" class="dropdown-item">
+                    Audio Editor
+                    <div class="item-desc">Advanced audio processing</div>
+                </a>
+                <a href="products.html" class="dropdown-item">
+                    Image Editor
+                    <div class="item-desc">Photo editing and enhancement</div>
+                </a>
+            </div>
+        </div>
+        <a href="ai-tools.html" class="nav-item hot">AI tools</a>
+        <a href="solutions.html" class="nav-item">Solutions</a>
+        <a href="resources.html" class="nav-item">Resources</a>
+        <a href="#" class="nav-item">NewsRoom</a>
+        <a href="#" class="btn btn-outline">Try VFXB Online</a>
+        <a href="#" class="btn btn-primary">Download</a>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <img src="vfxb.png" alt="VFXB Logo" style="height:35px;vertical-align:middle;margin-right:8px;">
+        </div>
+        <nav class="nav">
+            <div class="dropdown">
+                <a href="#" class="nav-item">Products</a>
+                <div class="dropdown-content">
+                    <a href="products.html" class="dropdown-item">
+                        Video Editor
+                        <div class="item-desc">Professional video editing tools</div>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        Audio Editor
+                        <div class="item-desc">Advanced audio processing</div>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        Image Editor
+                        <div class="item-desc">Photo editing and enhancement</div>
+                    </a>
+                    <a href="products.html" class="dropdown-item">
+                        Motion Graphics
+                        <div class="item-desc">Create stunning animations</div>
+                    </a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="nav-item hot">AI tools</a>
+                <div class="dropdown-content">
+                    <a href="ai-tools.html" class="dropdown-item">
+                        AI Video Generator
+                        <div class="item-desc">Create videos from text</div>
+                    </a>
+                    <a href="ai-tools.html" class="dropdown-item">
+                        AI Voice Clone
+                        <div class="item-desc">Clone any voice instantly</div>
+                    </a>
+                    <a href="ai-tools.html" class="dropdown-item">
+                        AI Captions
+                        <div class="item-desc">Auto-generate captions</div>
+                    </a>
+                    <a href="ai-tools.html" class="dropdown-item">
+                        AI Avatar
+                        <div class="item-desc">Create AI-powered avatars</div>
+                    </a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="nav-item">Solutions</a>
+                <div class="dropdown-content">
+                    <a href="solutions.html" class="dropdown-item">
+                        For Creators
+                        <div class="item-desc">Tools for content creators</div>
+                    </a>
+                    <a href="solutions.html" class="dropdown-item">
+                        For Business
+                        <div class="item-desc">Enterprise video solutions</div>
+                    </a>
+                    <a href="solutions.html" class="dropdown-item">
+                        For Education
+                        <div class="item-desc">Educational video tools</div>
+                    </a>
+                    <a href="solutions.html" class="dropdown-item">
+                        For Marketing
+                        <div class="item-desc">Marketing video creation</div>
+                    </a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="nav-item">Resources</a>
+                <div class="dropdown-content">
+                    <a href="resources.html" class="dropdown-item">
+                        Tutorials
+                        <div class="item-desc">Learn video editing</div>
+                    </a>
+                    <a href="resources.html" class="dropdown-item">
+                        Templates
+                        <div class="item-desc">Pre-made video templates</div>
+                    </a>
+                    <a href="resources.html" class="dropdown-item">
+                        Support
+                        <div class="item-desc">Get help and support</div>
+                    </a>
+                    <a href="resources.html" class="dropdown-item">
+                        Community
+                        <div class="item-desc">Join our community</div>
+                    </a>
+                </div>
+            </div>
+            <a href="#" class="nav-item">NewsRoom</a>
+        </nav>
+        <div class="header-buttons">
+            <a href="#" class="btn btn-outline">Try VFXB Online</a>
+            <a href="#" class="btn btn-primary">Download</a>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="badge pulse">All-in-one</div>
+        <h1 class="main-title float">AI-powered editor<br>for everyone</h1>
+        <p class="subtitle">Think bigger. Edit faster.</p>
+        <div class="main-buttons">
+            <a href="#" class="btn btn-primary btn-large">Download</a>
+            <a href="#" class="btn btn-outline btn-large">Try online</a>
+        </div>
+    </main>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <button class="nav-arrow prev" onclick="scrollFeatures('left')">‹</button>
+            <div class="features-scroll" id="featuresScroll">
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">AI video maker</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">AI captions</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Link to video</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Avatar video</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Text to speech</h3>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-preview"></div>
+                    <h3 class="feature-title">Dreamina</h3>
+                </div>
+            </div>
+            <button class="nav-arrow next" onclick="scrollFeatures('right')">›</button>
+        </div>
+    </section>
+
+    <!-- Expanded Content Section -->
+    <section class="expanded-content">
+        <div class="ai-floating-elements">
+        <div class="ai-floating-circle"></div>
+        <div class="ai-floating-circle"></div>
+        <div class="ai-floating-circle"></div>
+    </div>
+
+    <div class="ai-video-container">
+        <div class="ai-hero">
+            <h1>Editing just got<br>smarter and simpler</h1>
+            <p>Design to make your editing easier than ever.</p>
+            
+            
+        </div>
+
+        <div class="ai-features-grid">
+            <div class="ai-feature-card" onclick="aiPlayDemo(this)">
+                <div class="ai-video-placeholder">
+                    <span>✨ AI Magic</span>
+                </div>
+                <div class="ai-feature-content">
+                    <h2>Smart AI video maker</h2>
+                    <p>Remember spending hours on a single video? Those days are over! Our AI handles everything from scripting your ideas to adding perfect captions. It's like having a professional video editor who never sleeps and works at lightning speed.</p>
+                    
+                    <button class="ai-cta-button ai-pulse">Try It Free</button>
+                </div>
+            </div>
+
+            <div class="ai-feature-card" onclick="aiPlayDemo(this)">
+                <div class="ai-feature-content">
+                    <h2>One-Click Excellence</h2>
+                    <p>Why juggle between 10 different apps when you can create professional videos in one place? From thumbnail generation to voice synthesis, everything you need is right here. It's designed for real people with real deadlines.</p>
+                    
+                    <button class="ai-cta-button">Start Creating</button>
+                </div>
+                <div class="ai-video-placeholder">
+                    <span>🎬 Your Story</span>
+                </div>
+            </div>
+
+            <div class="ai-feature-card" onclick="aiPlayDemo(this)">
+                <div class="ai-video-placeholder">
+                    <span>🚀 Results</span>
+                </div>
+                <div class="ai-feature-content">
+                    <h2>Results That Speak</h2>
+                    <p>Whether you're a YouTuber, marketer, or educator, our AI understands your audience. It analyzes trends, suggests improvements, and helps your content perform better. Because great videos deserve great results.</p>
+                    
+                    <button class="ai-cta-button">See Results</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Integrate index2.html here -->
+     <!--
+    <iframe 
+
+        src="index2.html" 
+        style="width:100%;min-height:100vh;border:none;background:#111;display:block;margin:0 auto;border-radius:20px;box-shadow:0 8px 32px 0 rgba(31,38,135,0.12);" 
+        title="VFXB AI Toolkit">
+    </iframe>
+    -->
+    </section>
+    <section class="expanded-content-two">  
+            <div class="section-header">
+            <span class="section-tag">Generative AI</span>
+            <h2 class="section-title">Other EPIC AI Generative Tools!</h2>
+        </div>
+
+        <div class="tools-container">
+            <button class="scroll-btn prev" onclick="scrollTools(-1)">‹</button>
+            <div class="tools-grid" id="toolsGrid">
+                <div class="tool-card">
+                    <div class="card-image remove-object"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">Remove Object</h3>
+                        <p class="card-description">Remove any unwanted object from your image. Just drawing a line around it.</p>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="card-image remove-background"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Remove Background</h3>
+                        <p class="card-description">One-click background remover, let the AI do the boring work.</p>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="card-image face-swap"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Face Swap</h3>
+                        <p class="card-description">With the AI face swapper you become anyone you desire: a superhero, a heartthrob, a law enforcer, or an intellectual. Or just switch faces with a friend, there are no limits.</p>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="card-image super-scale"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Super Scale</h3>
+                        <p class="card-description">Use AI to upscale images and keep a superb quality.</p>
+                    </div>
+                </div>
+
+                <div class="tool-card">
+                    <div class="card-image super-sharp"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Super Sharp</h3>
+                        <p class="card-description">Enhance image clarity and details, bring a level of precision to your digital photography.</p>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="card-image super-sharp"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Super Sharp</h3>
+                        <p class="card-description">Enhance image clarity and details, bring a level of precision to your digital photography.</p>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="card-image super-sharp"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Super Sharp</h3>
+                        <p class="card-description">Enhance image clarity and details, bring a level of precision to your digital photography.</p>
+                    </div>
+                </div>
+                <div class="tool-card">
+                    <div class="card-image super-sharp"></div>
+                    <div class="card-content">
+                        <h3 class="card-title">AI Super Sharp</h3>
+                        <p class="card-description">Enhance image clarity and details, bring a level of precision to your digital photography.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="scroll-btn next" onclick="scrollTools(1)">›</button>
+        </div>
+
+    </section>
+
+    <script>
+         let currentScroll = 0;
+        const cardWidth = 256; // 240px card + 16px gap
+        let maxScroll = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startScrollLeft = 0;
+
+        function updateScrollButtons() {
+            const prevBtn = document.querySelector('.scroll-btn.prev');
+            const nextBtn = document.querySelector('.scroll-btn.next');
+            
+            prevBtn.disabled = currentScroll <= 0;
+            nextBtn.disabled = currentScroll >= maxScroll;
+        }
+
+        function calculateMaxScroll() {
+            const container = document.querySelector('.tools-container');
+            const grid = document.querySelector('.tools-grid');
+            const containerWidth = container.offsetWidth;
+            const gridWidth = grid.scrollWidth;
+            
+            maxScroll = Math.max(0, gridWidth - containerWidth);
+            updateScrollButtons();
+        }
+
+        function scrollTools(direction) {
+            const container = document.querySelector('.tools-container');
+            const containerWidth = container.offsetWidth;
+            const scrollAmount = Math.min(cardWidth * 1.5, containerWidth * 0.6);
+            
+            currentScroll += direction * scrollAmount;
+            currentScroll = Math.max(0, Math.min(currentScroll, maxScroll));
+            
+            document.getElementById('toolsGrid').style.transform = `translateX(-${currentScroll}px)`;
+            updateScrollButtons();
+        }
+
+        function smoothScrollTo(targetScroll) {
+            currentScroll = Math.max(0, Math.min(targetScroll, maxScroll));
+            document.getElementById('toolsGrid').style.transform = `translateX(-${currentScroll}px)`;
+            updateScrollButtons();
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            calculateMaxScroll();
+        });
+
+        // Recalculate on resize
+        window.addEventListener('resize', () => {
+            calculateMaxScroll();
+            if (currentScroll > maxScroll) {
+                currentScroll = maxScroll;
+                document.getElementById('toolsGrid').style.transform = `translateX(-${currentScroll}px)`;
+            }
+        });
+
+        // Enhanced touch and mouse drag support
+        const toolsGrid = document.querySelector('.tools-grid');
+
+        // Mouse events
+        toolsGrid.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.pageX;
+            startScrollLeft = currentScroll;
+            toolsGrid.style.cursor = 'grabbing';
+            toolsGrid.style.transition = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const walk = (e.pageX - startX) * 1.5;
+            const newScroll = startScrollLeft - walk;
+            smoothScrollTo(newScroll);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                toolsGrid.style.cursor = 'grab';
+                toolsGrid.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+            }
+        });
+
+        // Touch events
+        let touchStartX = 0;
+        let touchStartScrollLeft = 0;
+
+        toolsGrid.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartScrollLeft = currentScroll;
+            toolsGrid.style.transition = 'none';
+        }, { passive: true });
+
+        toolsGrid.addEventListener('touchmove', (e) => {
+            const touchX = e.touches[0].clientX;
+            const walk = (touchStartX - touchX) * 1.2;
+            const newScroll = touchStartScrollLeft + walk;
+            smoothScrollTo(newScroll);
+        }, { passive: true });
+
+        toolsGrid.addEventListener('touchend', () => {
+            toolsGrid.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+        });
+
+        // Prevent context menu on long press
+        toolsGrid.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Wheel scroll support
+        toolsGrid.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const direction = e.deltaY > 0 ? 1 : -1;
+            scrollTools(direction * 0.5);
+        }, { passive: false });
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+        }
+
+        // Features Scroll
+        function scrollFeatures(direction) {
+            const container = document.getElementById('featuresScroll');
+            const cardWidth = 300;
+            
+            if (direction === 'left') {
+                container.scrollLeft -= cardWidth;
+            } else {
+                container.scrollLeft += cardWidth;
+            }
+        }
+
+        // Custom Cursor (only for non-touch devices)
+        if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+            const cursor = document.querySelector('.cursor');
+            const cursorFollower = document.querySelector('.cursor-follower');
+            const cursorText = document.querySelector('.cursor-text');
+            let mouseX = 0;
+            let mouseY = 0;
+            let followerX = 0;
+            let followerY = 0;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                cursor.style.left = mouseX + 'px';
+                cursor.style.top = mouseY + 'px';
+                cursorText.style.left = mouseX + 'px';
+                cursorText.style.top = (mouseY - 50) + 'px';
+            });
+
+            function updateFollower() {
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+                cursorFollower.style.left = followerX + 'px';
+                cursorFollower.style.top = followerY + 'px';
+                requestAnimationFrame(updateFollower);
+            }
+            updateFollower();
+
+            // Show "Try Now" only over .features-section
+            const featuresSection = document.querySelector('.features-section');
+            featuresSection.addEventListener('mouseenter', () => {
+                cursorText.classList.add('show');
+            });
+            featuresSection.addEventListener('mouseleave', () => {
+                cursorText.classList.remove('show');
+            });
+
+            // Interactive elements cursor effects
+            const interactiveElements = document.querySelectorAll('.btn, .feature-card, .nav-item, .dropdown-item');
+            interactiveElements.forEach(element => {
+                element.addEventListener('mouseenter', () => {
+                    cursor.style.transform = 'scale(1.5)';
+                    cursorFollower.style.transform = 'scale(1.5)';
+                });
+                element.addEventListener('mouseleave', () => {
+                    cursor.style.transform = 'scale(1)';
+                    cursorFollower.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        // Particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 25 : 50;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles
+        createParticles();
+
+        // Button click effects
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Create ripple effect
+                const ripple = document.createElement('span');
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                btn.style.position = 'relative';
+                btn.style.overflow = 'hidden';
+                btn.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+                
+                // Simulate action
+                setTimeout(() => {
+                    alert('Feature coming soon! This is a demo.');
+                }, 300);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Feature card interactions
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const title = card.querySelector('.feature-title').textContent;
+                alert(`${title} feature selected! This is a demo.`);
+            });
+        });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.float');
+            
+            parallaxElements.forEach(element => {
+                const speed = 0.2;
+                element.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+
+            // EVU logo reveal effect
+            const evuSection = document.querySelector('.evu-logo-section');
+            const evuLogo = document.querySelector('.evu-logo');
+            const rect = evuSection.getBoundingClientRect();
+            
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
+                evuLogo.style.transform = `scale(${0.5 + progress * 0.5}) translateY(${(1 - progress) * 100}px)`;
+                evuLogo.style.opacity = progress;
+            }
+        });
+
+        // Dropdown menu interactions
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const href = item.getAttribute('href');
+                if (href && href !== '#') {
+                    window.location.href = href;
+                }
+            });
+        });
+
+        // Auto-scroll features
+        let autoScrollInterval;
+        
+        function startAutoScroll() {
+            if (window.innerWidth > 768) {
+                autoScrollInterval = setInterval(() => {
+                    const container = document.getElementById('featuresScroll');
+                    const maxScroll = container.scrollWidth - container.clientWidth;
+                    
+                    if (container.scrollLeft >= maxScroll) {
+                        container.scrollLeft = 0;
+                    } else {
+                        container.scrollLeft += 300;
+                    }
+                }, 4000);
+            }
+        }
+
+        function stopAutoScroll() {
+            clearInterval(autoScrollInterval);
+        }
+
+        // Start auto-scroll after page loads
+        setTimeout(startAutoScroll, 3000);
+
+        // Stop auto-scroll on user interaction
+        const featuresScroll = document.getElementById('featuresScroll');
+        featuresScroll.addEventListener('mouseenter', stopAutoScroll);
+        featuresScroll.addEventListener('touchstart', stopAutoScroll);
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            
+            if (!mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animations
+        document.querySelectorAll('.feature-card, .evu-logo-section').forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(50px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(element);
+        });
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            const particlesContainer = document.getElementById('particles');
+            particlesContainer.innerHTML = '';
+            createParticles();
+        });
+
+        // Loading animation
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                scrollFeatures('left');
+            } else if (e.key === 'ArrowRight') {
+                scrollFeatures('right');
+            }
+        });
+    </script>
+</body>
+</html>
