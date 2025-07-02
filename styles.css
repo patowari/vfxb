@@ -1039,7 +1039,7 @@ body {
     
         .expanded-content-two {
             padding: 60px 40px;
-            max-width: 1800px;
+            max-width: 20000px;
             margin: 0 auto;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: white;
